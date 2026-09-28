@@ -80,7 +80,13 @@ def main(argv=None):
     L.append(md_table(cov[cov["radius_km"] == r0].drop(columns=["radius_km"])))
     L.append("")
 
-    L.append("## 5. Events not evaluated\n")
+    L.append("## 5. Documented-limitation test: Al Raha 2023 bloom period\n")
+    lim = pd.read_csv(od / "limitation_test.csv")
+    L.append("Detector state over the whole documented bloom period (not just t_ref). Alert episodes in the period: "
+             "see `episodes_alraha_r<radius>.csv`.\n")
+    L.append(md_table(lim))
+    L.append("")
+    L.append("## 6. Events not evaluated\n")
     for e in events:
         if e.get("evaluation") == "NOT-EVALUATED":
             L.append(f"- **{e['id']}** — {e['name']} ({e['shutdown_start']}, precision {e['date_precision']}): "

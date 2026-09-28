@@ -115,6 +115,8 @@ events:
     coord_status: ESTIMATED
     species: "Brief says Pseudo-nitzschia multistriata (EAD). NOT CONFIRMED: located sources say only 'algal bloom'; July 2023 tests reportedly found no toxins."
     bloom_period: "2023-04 (sampling start) to at least 2023-10-09 (news report)"
+    bloom_period_start: "2023-04-01"
+    bloom_period_end: "2023-10-09"
     date_precision: month
     t_ref: "2023-04-15"         # mid-month of the earliest documented observation month (sampling since April 2023)
     t_ref_earliest: "2023-04-01"

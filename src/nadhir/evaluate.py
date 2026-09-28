@@ -137,7 +137,7 @@ def main(argv=None):
     stamp = f"Nadhir hindcast | detector {a.frozen} (tag commit {tag_commit}) | code {commit} | " \
             f"data: Sentinel-3 OLCI L2 WFR OC4Me via AWS meeo-s3 mirror; bins sha256 in outputs/{a.frozen}/provenance.json"
 
-    lead_rows, far_rows, cov_rows = [], [], []
+    lead_rows, far_rows, cov_rows, lim_rows = [], [], [], []
     for r in fz["radii_km"]:
         zd = D.zone_daily(daily, clim, r, det["z_threshold"], det["min_valid_bins_frac"],
                           {k: dates for k in cfg["intakes"]})
@@ -166,12 +166,22 @@ def main(argv=None):
                                   "radius_km": r, "f_threshold": thr, "date_precision": ev["date_precision"],
                                   "evidence_status": ev["evidence_status"], **res})
                 plot_event(z, thr, ev, res, r, odir / f"event_{ev['id']}_r{r}.png", stamp)
+                if ev.get("bloom_period_start"):
+                    bp = z[D.in_period(z["date"], [ev["bloom_period_start"], ev["bloom_period_end"]])]
+                    lim_rows.append({"event": ev["id"], "intake": intake, "radius_km": r, "f_threshold": thr,
+                                     "period": f'{ev["bloom_period_start"]}..{ev["bloom_period_end"]}',
+                                     "days": len(bp), "observed_days": int(bp["observed"].sum()),
+                                     "exceed_or_alert_days": int(bp["state"].isin(["EXCEED", "ALERT"]).sum()),
+                                     "alert_days": int((bp["state"] == "ALERT").sum()),
+                                     "max_anom_frac": round(float(bp["anom_frac"].max()), 4),
+                                     "median_anom_frac": round(float(bp["anom_frac"].median()), 4)})
         pd.concat(allz).to_csv(odir / f"zone_daily_r{r}.csv", index=False, float_format="%.4f")
 
     leads = pd.DataFrame(lead_rows)
     leads.to_csv(odir / "event_lead_times.csv", index=False)
     far = pd.DataFrame(far_rows)
     far.to_csv(odir / "false_alarms.csv", index=False)
+    pd.DataFrame(lim_rows).to_csv(odir / "limitation_test.csv", index=False)
     cov = pd.DataFrame(cov_rows)
     cov.to_csv(odir / "coverage.csv", index=False)
     prov = {"detector": a.frozen, "tag_commit": tag_commit, "code_commit": commit,

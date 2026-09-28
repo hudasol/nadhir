@@ -104,10 +104,13 @@ detector:
   z_threshold: 2.0             # bin is "anomalous" if z >= 2 (≈ upper 2.3% under normality)
   min_valid_bins_frac: 0.10    # zone-day is OBSERVED only if >=10% of zone bins with climatology are valid
   target_daily_false_alarm_rate: 0.05  # f_threshold = 95th pct of calibration quiet-day anomaly fraction
+  min_f_threshold: 0.05        # floor on f_threshold: >=5% of observed zone bins must be anomalous (avoids f*=0)
+  min_clim_sd: 0.05            # floor on climatology SD in log10 units (~12%) so near-constant bins can't explode z
   persistence_obs: 2           # alert needs anomaly on >=2 observed days within persistence_window_days
   persistence_window_days: 7
   episode_break_quiet_obs: 2   # an alert episode ends after 2 consecutive observed non-anomalous days
-  max_lookback_days: 120       # lead times longer than this are reported as ">= 120 (censored)"
+  max_lookback_days: 120       # alert episodes must have exceeded within 120 d before t_ref
+  late_window_days: 30         # an alert starting <=30 d AFTER t_ref is reported as LATE (negative lead)
 
 outputs:
   derived_dir: data/derived

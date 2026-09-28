@@ -1,0 +1,13 @@
+# SYNTHETIC TEST FIXTURE — not real data
+intake,date,observed,anom_frac
+x,2020-01-01,True,0.0
+x,2020-01-02,False,
+x,2020-01-03,True,0.30
+x,2020-01-04,False,
+x,2020-01-05,True,0.40
+x,2020-01-06,True,0.50
+x,2020-01-07,False,
+x,2020-01-08,True,0.0
+x,2020-01-09,False,
+x,2020-01-10,True,0.0
+x,2020-01-11,True,0.60

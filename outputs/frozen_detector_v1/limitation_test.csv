@@ -1,0 +1,4 @@
+event,intake,radius_km,f_threshold,period,days,observed_days,exceed_or_alert_days,alert_days,max_anom_frac,median_anom_frac
+E2023-ALRAHA,alraha,50,0.154503,2023-04-01..2023-10-09,192,102,6,3,0.5529,0.0
+E2023-ALRAHA,alraha,25,0.141883,2023-04-01..2023-10-09,192,99,6,1,0.25,0.0
+E2023-ALRAHA,alraha,100,0.194769,2023-04-01..2023-10-09,192,106,8,4,0.5811,0.0127

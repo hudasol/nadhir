@@ -64,3 +64,8 @@ Format: decision · alternatives considered · reason · date (UTC).
 ## D-012 Freeze
 - Detector frozen from calibration years 2019–2021 at 2026-09-28T16:12Z, committed and tagged `frozen-detector-v1` before any event-year statistic was computed. Event-year bin files (2018 on disk; 2022–2023 still extracting) were not read by any analysis code before the tag.
 - **Date:** 2026-09-28
+
+## D-013 Tag `frozen-detector-v1` exists locally; the remote refused the tag push
+- `git push origin frozen-detector-v1` → `error: RPC failed; HTTP 403` from the session git proxy (only the designated branch may be pushed). The frozen state is still verifiable remotely: commit `723212e` ("Freeze detector v1 …") was pushed to `claude/affectionate-bardeen-isp1tm` before any evaluation commit, and `config/frozen_detector_v1.yaml` records SHA-256 of the climatology and every calibration input. `make tag-check` accepts the local tag.
+- **To publish the tag:** `git tag -a frozen-detector-v1 723212e -m "Frozen detector v1" && git push origin frozen-detector-v1` from any machine with push rights.
+- **Date:** 2026-09-28

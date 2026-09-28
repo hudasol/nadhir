@@ -1,9 +1,11 @@
 # Nadhir Hindcast MVP — `make all` reproduces everything from raw download to charts.
 # Raw granules are streamed into memory and never stored; derived bin tables are committed.
 PY ?= .venv/bin/python
-.PHONY: all setup index extract freeze tag-check evaluate report test clean-derived
+.PHONY: all setup index extract freeze verify-freeze tag-check evaluate report test
 
-all: setup index extract freeze evaluate report
+# On a fresh clone the tag already exists: `all` re-derives everything and VERIFIES the frozen
+# detector (identical thresholds + climatology hash) instead of re-freezing.
+all: setup index extract verify-freeze evaluate report
 
 setup:
 	uv venv -q .venv -p 3.11 || python3 -m venv .venv
@@ -18,6 +20,9 @@ extract:        ## stream granules, flag-screen, bin around intakes (per year, r
 freeze:         ## BLIND: climatology + thresholds from calibration years only
 	$(PY) -m nadhir.freeze
 	@echo ">>> Now commit and tag: git tag frozen-detector-v1 — BEFORE 'make evaluate'"
+
+verify-freeze:
+	$(PY) -m nadhir.freeze --verify
 
 tag-check:
 	@git rev-parse -q --verify refs/tags/frozen-detector-v1 >/dev/null || \

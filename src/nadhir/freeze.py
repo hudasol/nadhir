@@ -36,7 +36,22 @@ def git_head() -> str:
         return "unknown"
 
 
-def main():
+def tag_exists(tag: str) -> bool:
+    return subprocess.run(["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag}"], cwd=repo_path("."),
+                          capture_output=True).returncode == 0
+
+
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--verify", action="store_true",
+                    help="recompute into a scratch suffix and compare thresholds with the committed frozen file")
+    ap.add_argument("--force", action="store_true", help="overwrite even if tag frozen-detector-v1 exists")
+    a = ap.parse_args(argv)
+    suffix = "_verify" if a.verify else ""
+    if not a.verify and not a.force and tag_exists("frozen-detector-v1"):
+        raise SystemExit("tag frozen-detector-v1 exists: refusing to overwrite (use --verify, or --force and log "
+                         "the reason in DECISIONS.md)")
     cfg = load_config()
     det, per = cfg["detector"], cfg["periods"]
     cal = per["calibration"]
@@ -47,7 +62,7 @@ def main():
     daily = D.daily_bins(bins)
     daily = daily[D.in_period(daily["date"], cal)]
     clim = D.climatology(daily, det["min_clim_days"], det["min_clim_sd"])
-    clim_path = ddir / "climatology_v1.csv.gz"
+    clim_path = ddir / f"climatology_v1{suffix}.csv.gz"
     clim.to_csv(clim_path, index=False, float_format="%.5f")
 
     dates = D.date_range(*cal)
@@ -64,7 +79,7 @@ def main():
                 "f_threshold": round(float(row["f_threshold"]), 6),
                 "f_quantile_raw": round(float(row["f_quantile"]), 6),
                 "n_cal_observed_days": int(row["n_cal_obs_days"])}
-    zpath = ddir / "zone_daily_calibration_v1.csv"
+    zpath = ddir / f"zone_daily_calibration_v1{suffix}.csv"
     pd.concat(zds).to_csv(zpath, index=False, float_format="%.5f")
 
     frozen = {
@@ -84,6 +99,13 @@ def main():
         "zone_daily_calibration": {"path": str(zpath.relative_to(repo_path("."))), "sha256": sha256(zpath)},
         "thresholds": thresholds,
     }
+    if a.verify:
+        ref = yaml.safe_load(open(repo_path("config/frozen_detector_v1.yaml")))
+        same = ref["thresholds"] == thresholds and ref["climatology"]["sha256"] == frozen["climatology"]["sha256"]
+        clim_path.unlink()
+        zpath.unlink()
+        print("verify-freeze:", "IDENTICAL to committed frozen detector" if same else "DIFFERS from committed frozen detector")
+        raise SystemExit(0 if same else 1)
     out = repo_path("config/frozen_detector_v1.yaml")
     with open(out, "w") as f:
         yaml.safe_dump(frozen, f, sort_keys=False)

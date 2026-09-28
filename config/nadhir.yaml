@@ -1,0 +1,34 @@
+# Nadhir Hindcast MVP configuration.
+# RULE: no magic numbers in code. Every value here carries a comment saying where it came from.
+# Values marked "DESIGN CHOICE" are engineering decisions logged in DECISIONS.md, not measurements.
+
+region:
+  # Arabian Gulf + Strait of Hormuz + Gulf of Oman. Box given in the project brief
+  # ("roughly 48–60°E, 22–30°N"). DESIGN CHOICE: used verbatim.
+  lon_min: 48.0
+  lon_max: 60.0
+  lat_min: 22.0
+  lat_max: 30.0
+
+sources:
+  olci:
+    # Sentinel-3A OLCI Level-2 Water Full Resolution (WFR, 300 m), baseline collection 002/003,
+    # served as unpacked SAFE folders by the MEEO mirror in the AWS Open Data Registry
+    # (registry file datasets/sentinel-3.yaml: "arn:aws:s3:::meeo-s3/NTC/", region eu-central-1,
+    # "Data is available from July 2017 onwards"). Chosen because every primary ocean-colour
+    # archive (NASA OB.DAAC, Copernicus Marine, ESA OC-CCI, NOAA ERDDAP) is blocked by this
+    # environment's egress policy — see data/SOURCE_STATUS.md.
+    bucket_url: "https://meeo-s3.s3.eu-central-1.amazonaws.com"
+    prefix_template: "NTC/{platform}/OL_2_WFR___/{yyyy}/{mm}/{dd}/"
+    platforms: ["S3A", "S3B"]
+    # Files pulled per granule (ESA OLCI L2 product definition, Sentinel-3 OLCI Marine User Handbook):
+    # chl_oc4me = OC4Me band-ratio chlorophyll (log10 mg m-3); wqsf = water quality & science flags;
+    # geo_coordinates = per-pixel lat/lon (no geolocation interpolation needed).
+    files: ["chl_oc4me.nc", "wqsf.nc", "geo_coordinates.nc"]
+    # Descending daytime pass over 48–60°E at ~10:00 local solar time => ~05:30–07:30 UTC.
+    # (S3 mean local solar time at descending node 10:00, ESA Sentinel-3 mission guide.)
+    # Only used to skip reading manifests of granules that cannot overlap the region.
+    utc_start_hour_min: 5.0
+    utc_start_hour_max: 7.75
+    index_start: "2017-07-01"   # mirror start (AWS registry description)
+    index_end: "2023-12-31"     # covers the 2018 and 2023 cases plus quiet years

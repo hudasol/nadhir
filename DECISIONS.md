@@ -54,3 +54,13 @@ Format: decision · alternatives considered · reason · date (UTC).
 - **Alternatives:** absolute chl threshold (e.g. 10 mg m-3) — not site-adaptive; ML classifier — not auditable with 3 events.
 - **Reason:** every parameter is either a stated design choice or fitted on calibration data only; a sceptical engineer can recompute it by hand from the committed bin tables.
 - **Date:** 2026-09-28
+
+## D-011 Processing-baseline change 002→003 is reported, not corrected
+- **Finding (calibration data only, `data/derived/qa_baseline_step.csv`):** median per-bin-month difference in log10 chl, 2021 (collection 003) minus 2019–2020 (002), within 50 km: Al Raha −0.024, Barka −0.103 (≈ −21% chl), Kalba +0.015. This difference mixes the processing change with real interannual variability; the two cannot be separated with this data.
+- **Alternatives:** per-collection climatologies (only one 003 calibration year → too few days per bin-month); an additive offset correction (would be an adjustment of real data with an unseparable confound).
+- **Reason:** calibration spans both collections, so the climatology mixes them. Direction of possible bias: if 003 is genuinely lower at Barka, 2023 (003) z-scores at Barka are biased LOW → fewer alerts → the reported Barka-2023 lead time would be pessimistic, not flattering. Stated as a caveat in RESULTS.
+- **Date:** 2026-09-28 (before freeze)
+
+## D-012 Freeze
+- Detector frozen from calibration years 2019–2021 at 2026-09-28T16:12Z, committed and tagged `frozen-detector-v1` before any event-year statistic was computed. Event-year bin files (2018 on disk; 2022–2023 still extracting) were not read by any analysis code before the tag.
+- **Date:** 2026-09-28

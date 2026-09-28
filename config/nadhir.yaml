@@ -32,3 +32,83 @@ sources:
     utc_start_hour_max: 7.75
     index_start: "2017-07-01"   # mirror start (AWS registry description)
     index_end: "2023-12-31"     # covers the 2018 and 2023 cases plus quiet years
+    # EUMETSAT-recommended OC4Me quality flags (Sentinel-3 OLCI Marine User Handbook / EUMETSAT
+    # "OLCI Level 2 recommended flags" for CHL_OC4ME). Cited from domain knowledge; the EUMETSAT page
+    # could not be fetched here (host blocked) -> citation status UNVERIFIED in SOURCES.md (S-FLAGS).
+    # A pixel with ANY of these bits set is discarded (never filled).
+    reject_flags: [INVALID, LAND, CLOUD, CLOUD_AMBIGUOUS, CLOUD_MARGIN, SNOW_ICE, SUSPECT, HISOLZEN,
+                   SATURATED, HIGHGLINT, WHITECAPS, AC_FAIL, OC4ME_FAIL, ANNOT_TAU06,
+                   RWNEG_O2, RWNEG_O3, RWNEG_O4, RWNEG_O5, RWNEG_O6, RWNEG_O7, RWNEG_O8]
+    chl_variable: CHL_OC4ME        # DECISIONS D-002
+    # tie-point grid is used ONLY to choose which pixel rows/cols to read (plus margin);
+    # the lat/lon of every retained pixel comes from geo_coordinates.nc (DECISIONS D-003).
+    window_margin_px: 64           # one tie-point column spacing (ac_subsampling_factor = 64 in file attrs)
+
+    workers: 6                     # parallel granule processes (4 CPUs, I/O overlap); performance only
+
+# Intakes. Coordinates are PLANT/TOWN locations, not surveyed intake positions -> all ESTIMATED.
+# Uncertainty (~5–10 km) is small relative to the 50 km watch radius; sensitivity radii bracket it.
+intakes:
+  kalba:
+    name: "SEWA Kalba desalination (Sharjah east coast, Gulf of Oman)"
+    lat: 25.05
+    lon: 56.36
+    coord_status: ESTIMATED
+    coord_note: "Kalba town waterfront; intake position not published in any source we could reach (SOURCES S-KALBA-LOC). Uncertainty ~10 km."
+  barka:
+    name: "Barka desalination cluster (Barka I/II, South Batinah, Oman)"
+    lat: 23.707
+    lon: 57.9816
+    coord_status: ESTIMATED
+    coord_note: "Barka II IWPP plant location per Global Energy Monitor wiki search snippet (SOURCES S-BARKA-LOC, UNVERIFIED). Intake is offshore of plant; uncertainty ~5 km."
+  alraha:
+    name: "Al Raha Beach, Abu Dhabi (known-miss case; not an intake)"
+    lat: 24.45
+    lon: 54.60
+    coord_status: ESTIMATED
+    coord_note: "Al Raha Beach district waterfront, general gazetteer position; uncertainty ~5 km. Not a desalination intake — used only for the documented-limitation case."
+
+grid:
+  # DESIGN CHOICE (DECISIONS D-007): 0.05° bins (~5 km) — aggregates 300 m pixels by averaging
+  # log10 chl of VALID pixels only. No value is ever created for a bin without valid pixels.
+  bin_deg: 0.05
+  min_pixels_per_bin: 5        # DESIGN CHOICE: bin-day needs >=5 valid 300 m pixels (~0.45 km²) to count
+
+zones:
+  # Watch radius around each intake. DESIGN CHOICE (D-008): 50 km primary ≈ 1–3 days of advection at
+  # 0.2–0.5 m/s surface currents typical of the Gulf of Oman coastal current (order-of-magnitude, UNVERIFIED).
+  primary_radius_km: 50
+  sensitivity_radii_km: [25, 100]
+
+periods:
+  # Blind protocol (rule 5). DESIGN CHOICE (D-009, revised before any detector output existed):
+  # the mirror has NO granules before 2018-01 (index log), so calibration uses the three years with
+  # no documented disruption at our intakes. 2018 and 2023 contain the evaluated events.
+  calibration: ["2019-01-01", "2021-12-31"]   # climatology + threshold fitting only
+  heldout_quiet: ["2022-01-01", "2022-12-31"] # out-of-sample false-alarm estimate, all intakes
+  # Extra out-of-sample quiet days: event years outside event exclusion windows, per intake,
+  # except intake-years listed in quiet_exclude (undated or unbounded blooms known there).
+  extra_quiet_years: [2018, 2023]
+  quiet_exclude:
+    barka: [2018]    # ACWA Barka second 2018 bloom, date unknown (events.yaml unresolved_leads)
+    alraha: [2023]   # Al Raha bloom persisted Apr–Oct 2023 (E2023-ALRAHA)
+  # Days removed around every documented event t_ref at that intake from any quiet statistic.
+  event_exclusion_before_days: 120
+  event_exclusion_after_days: 90
+  data_start: "2018-01-01"   # first OLCI granule over the region on the mirror (olci_index.csv)
+
+detector:
+  # DESIGN CHOICES (D-010), fixed BEFORE any event lead time is computed.
+  climatology: per-bin, per-calendar-month mean & SD of daily bin log10(chl), calibration period only
+  min_clim_days: 8             # bin-month needs >= 8 calibration days to have a climatology
+  z_threshold: 2.0             # bin is "anomalous" if z >= 2 (≈ upper 2.3% under normality)
+  min_valid_bins_frac: 0.10    # zone-day is OBSERVED only if >=10% of zone bins with climatology are valid
+  target_daily_false_alarm_rate: 0.05  # f_threshold = 95th pct of calibration quiet-day anomaly fraction
+  persistence_obs: 2           # alert needs anomaly on >=2 observed days within persistence_window_days
+  persistence_window_days: 7
+  episode_break_quiet_obs: 2   # an alert episode ends after 2 consecutive observed non-anomalous days
+  max_lookback_days: 120       # lead times longer than this are reported as ">= 120 (censored)"
+
+outputs:
+  derived_dir: data/derived
+  out_dir: outputs

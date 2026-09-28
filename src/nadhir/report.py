@@ -47,7 +47,8 @@ def main(argv=None):
              f"evaluation code commit `{prov['code_commit']}`.")
     L.append(f"- Calibration period (thresholds + climatology): {fz['calibration_period'][0]} → {fz['calibration_period'][1]}.")
     L.append(f"- config/nadhir.yaml sha256 `{prov['config_sha256'][:16]}…`; frozen config sha256 `{prov['frozen_config_sha256'][:16]}…`; events.yaml sha256 `{prov['events_sha256'][:16]}…`.")
-    L.append("- Input bin tables (sha256): " + ", ".join(f"`{k}` `{v[:12]}…`" for k, v in prov["olci_bins_sha256"].items()))
+    L.append("- Input bin tables (content sha256 of decompressed CSV): " + ", ".join(
+        f"`{k}` `{v['content_sha256'][:12]}…`" for k, v in prov["olci_bins_sha256"].items()))
     L.append("- Source granule files (SHA-256 + S3 ETag per file): `data/derived/olci_objects_<year>.csv`.")
     L.append("- Data: Sentinel-3 OLCI L2 WFR `CHL_OC4ME` (ESA/EUMETSAT), AWS `meeo-s3` mirror; flags per config `reject_flags`.\n")
 

@@ -29,6 +29,14 @@ def sha256(path) -> str:
     return h.hexdigest()
 
 
+def content_sha256(path) -> str:
+    """SHA-256 of the decompressed bytes of a .gz file (or raw bytes otherwise)."""
+    import gzip
+    op = gzip.open if str(path).endswith(".gz") else open
+    with op(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
 def git_head() -> str:
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo_path(".")).decode().strip()
@@ -101,7 +109,12 @@ def main(argv=None):
     }
     if a.verify:
         ref = yaml.safe_load(open(repo_path("config/frozen_detector_v1.yaml")))
-        same = ref["thresholds"] == thresholds and ref["climatology"]["sha256"] == frozen["climatology"]["sha256"]
+        # compare decompressed content: gzip headers embed mtime + filename, so .gz hashes always differ
+        ref_clim = repo_path(ref["climatology"]["path"])
+        same_clim = content_sha256(ref_clim) == content_sha256(clim_path)
+        same_thr = ref["thresholds"] == thresholds
+        print(f"thresholds identical: {same_thr}; climatology content identical: {same_clim}")
+        same = same_thr and same_clim
         clim_path.unlink()
         zpath.unlink()
         print("verify-freeze:", "IDENTICAL to committed frozen detector" if same else "DIFFERS from committed frozen detector")

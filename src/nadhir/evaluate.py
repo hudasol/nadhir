@@ -20,7 +20,7 @@ import yaml  # noqa: E402
 
 from nadhir import detector as D  # noqa: E402
 from nadhir.config import load_config, repo_path  # noqa: E402
-from nadhir.freeze import sha256  # noqa: E402
+from nadhir.freeze import content_sha256, sha256  # noqa: E402
 
 
 def git(*args) -> str:
@@ -125,7 +125,8 @@ def main(argv=None):
     odir.mkdir(parents=True, exist_ok=True)
 
     files = sorted(ddir.glob("olci_bins_20*.csv.gz"))
-    data_sha = {f.name: sha256(f) for f in files}
+    # content hash (decompressed) is stable across re-runs; .gz file hash is what is committed
+    data_sha = {f.name: {"gz_sha256": sha256(f), "content_sha256": content_sha256(f)} for f in files}
     bins = pd.concat([pd.read_csv(f) for f in files])
     daily = D.daily_bins(bins)
     clim = pd.read_csv(repo_path(fz["climatology"]["path"]))

@@ -26,7 +26,7 @@ Two blind, reproducible hindcasts on real satellite data:
 | Connectivity tests; blocked hosts listed; owner-supplied routes logged | data/SOURCE_STATUS.md |
 | OLCI: 2,399 granules streamed, 0 failures, SHA-256 per file | data/derived/olci_*.csv(.gz) |
 | MODIS: 12 yearly ERDDAP files (owner download), SHA-256 per file | data/derived/modis_*.csv(.gz) |
-| Events: 8 rows, date precision, evidence status; Al Raha upgraded to VERIFIED-PRIMARY | events/events.yaml |
+| Events: 8 rows, date precision, evidence status; Al Raha VERIFIED-PRIMARY; Kalba 2018, Barka 2018/2023, RAK 2008 VERIFIED-SECONDARY (2026-09-30) | events/events.yaml |
 | Sources: 21 search-located + 8 upgrades via the owner's HAB-hyperspectral repo (read-only) | SOURCES.md |
 | Blind protocol ×2: freeze → commit → tag → evaluate. `frozen-detector-v1` @ `723212e` (calibration 2019–21); `frozen-detector-modis-v1` @ `0eef7be` (calibration 2003–07). Same detector parameters; `verify-freeze` recomputes both bit-identically | config/frozen_detector_*.yaml, DECISIONS D-012, D-014 |
 | Evaluation: lead times + bounds, activity over imprecise periods, held-out false alarms, coverage/gaps, 3 radii, charts | outputs/frozen_detector_v1/, outputs/frozen_detector_modis_v1/ |
@@ -40,7 +40,7 @@ Two blind, reproducible hindcasts on real satellite data:
 - **Not done:** sea temperature, currents and drift modelling (D-006); the Barka miss diagnosis (hypotheses only in RESULTS §5).
 
 ## Next steps after submission
-1. Fetch and paste verbatim excerpts for the UNVERIFIED news sources (Gulf News 2018, Oman Observer 2018, Muscat Daily 2023, The National RAK 2008).
+1. Re-try the two failed fetches (Khaleej Times 2018, Arabian Business 2018) and confirm the Dibba "late August 2008" phrase in Zhao & Ghedira (2014) full text; everything else in SOURCES.md is now fetched or verified.
 2. Get operator shutdown logs and intake coordinates (SEWA, SMN Barka, Nama). These are the largest lead-time uncertainty.
 3. Publish the tags from a machine with push rights:
    `git tag -a frozen-detector-v1 723212e -m v1 && git tag -a frozen-detector-modis-v1 0eef7be -m modis-v1 && git push origin --tags`

@@ -19,7 +19,7 @@ import pandas as pd  # noqa: E402
 import yaml  # noqa: E402
 
 from nadhir import detector as D  # noqa: E402
-from nadhir.config import load_config, repo_path  # noqa: E402
+from nadhir.config import load_config, profile, repo_path  # noqa: E402
 from nadhir.freeze import content_sha256, sha256  # noqa: E402
 
 
@@ -113,18 +113,46 @@ def plot_event(z, thr, ev, res, radius, path, stamp):
     plt.close(fig)
 
 
+def plot_period(z, thr, ev, radius, path, stamp):
+    """Alert activity over a documented bloom period (events with no usable single date)."""
+    p0, p1 = pd.Timestamp(ev["bloom_period_start"]), pd.Timestamp(ev["bloom_period_end"])
+    w = z[(pd.to_datetime(z["date"]) >= p0 - pd.Timedelta(days=60)) &
+          (pd.to_datetime(z["date"]) <= p1 + pd.Timedelta(days=60))].copy()
+    w["d"] = pd.to_datetime(w["date"])
+    fig, ax = plt.subplots(figsize=(10, 4.2))
+    ax.axvspan(p0, p1, color="#bfdbfe", alpha=0.35, label=f"documented period {ev['bloom_period_start']}..{ev['bloom_period_end']}")
+    for s_, c in {"QUIET": "#6b7280", "EXCEED": "#d97706", "ALERT": "#b91c1c"}.items():
+        ww = w[w["state"] == s_]
+        ax.scatter(ww["d"], ww["anom_frac"], s=14, c=c, label=s_, zorder=3)
+    nd = w[w["state"] == "NODATA"]
+    ax.scatter(nd["d"], np.full(len(nd), -0.04), marker="|", s=30, c="#9ca3af", label="NO-DATA (gap, not filled)")
+    ax.axhline(thr, ls="--", c="#111827", lw=1, label=f"frozen threshold f* = {thr:.3f}")
+    ax.set_ylim(-0.08, 1.02)
+    ax.set_ylabel(f"share of observed bins with z≥2 (≤{radius} km)")
+    ax.set_title(f"{ev['id']} — alert activity over documented period (no single date → no lead time)", fontsize=11)
+    ax.legend(fontsize=7, loc="upper left", ncol=2, frameon=False)
+    ax.grid(alpha=0.25)
+    fig.text(0.01, 0.005, stamp, fontsize=6, color="#6b7280")
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--frozen", default="frozen_detector_v1")
+    ap.add_argument("--profile", default="olci_v1")
     a = ap.parse_args(argv)
-    cfg = load_config()
+    cfg = profile(load_config(), a.profile)
+    prof = cfg["profile"]
+    a.frozen = prof["frozen_name"]
     fz = load_frozen(a.frozen)
     det = fz["detector_params"]
-    events = yaml.safe_load(open(repo_path("events/events.yaml")))["events"]
+    events = [e for e in yaml.safe_load(open(repo_path("events/events.yaml")))["events"]
+              if e.get("dataset") == prof["name"]]
     ddir, odir = repo_path(cfg["outputs"]["derived_dir"]), repo_path(cfg["outputs"]["out_dir"]) / a.frozen
     odir.mkdir(parents=True, exist_ok=True)
 
-    files = sorted(ddir.glob("olci_bins_20*.csv.gz"))
+    files = sorted(ddir.glob(f"{prof['bins_prefix']}_bins_[0-9]*.csv.gz"))
     # content hash (decompressed) is stable across re-runs; .gz file hash is what is committed
     data_sha = {f.name: {"gz_sha256": sha256(f), "content_sha256": content_sha256(f)} for f in files}
     bins = pd.concat([pd.read_csv(f) for f in files])
@@ -134,9 +162,9 @@ def main(argv=None):
     end = max(daily["date"])
     dates = D.date_range(start, end)
     commit = git("rev-parse", "--short", "HEAD")
-    tag_commit = git("rev-list", "-n", "1", "--abbrev-commit", a.frozen.replace("_", "-"))
+    tag_commit = git("rev-list", "-n", "1", "--abbrev-commit", prof["tag"])
     stamp = f"Nadhir hindcast | detector {a.frozen} (tag commit {tag_commit}) | code {commit} | " \
-            f"data: Sentinel-3 OLCI L2 WFR OC4Me via AWS meeo-s3 mirror; bins sha256 in outputs/{a.frozen}/provenance.json"
+            f"data: {prof['data_label']}; input sha256 in outputs/{a.frozen}/provenance.json"
 
     lead_rows, far_rows, cov_rows, lim_rows = [], [], [], []
     for r in fz["radii_km"]:
@@ -159,39 +187,51 @@ def main(argv=None):
             far_rows.append({"intake": intake, "radius_km": r, "f_threshold": thr, "set": "calibration (in-sample)",
                              **false_alarm_stats(z, eps, cm)})
             for ev in events:
-                if ev.get("intake_key") != intake or ev.get("evaluation") not in ("EVALUATED", "LIMITATION-TEST"):
+                if ev.get("intake_key") != intake:
                     continue
-                res = D.lead_time(z, eps, ev["t_ref"], ev["t_ref_earliest"], det["max_lookback_days"],
-                                  start, det["late_window_days"])
-                lead_rows.append({"event": ev["id"], "evaluation": ev["evaluation"], "intake": intake,
-                                  "radius_km": r, "f_threshold": thr, "date_precision": ev["date_precision"],
-                                  "evidence_status": ev["evidence_status"], **res})
-                plot_event(z, thr, ev, res, r, odir / f"event_{ev['id']}_r{r}.png", stamp)
+                if ev.get("evaluation") in ("EVALUATED", "LIMITATION-TEST") and ev.get("t_ref"):
+                    res = D.lead_time(z, eps, ev["t_ref"], ev["t_ref_earliest"], det["max_lookback_days"],
+                                      start, det["late_window_days"])
+                    lead_rows.append({"event": ev["id"], "evaluation": ev["evaluation"], "intake": intake,
+                                      "radius_km": r, "f_threshold": thr, "date_precision": ev["date_precision"],
+                                      "evidence_status": ev["evidence_status"], **res})
+                    plot_event(z, thr, ev, res, r, odir / f"event_{ev['id']}_r{r}.png", stamp)
                 if ev.get("bloom_period_start"):
                     bp = z[D.in_period(z["date"], [ev["bloom_period_start"], ev["bloom_period_end"]])]
-                    lim_rows.append({"event": ev["id"], "intake": intake, "radius_km": r, "f_threshold": thr,
+                    ep_in = eps[D.in_period(eps["first_alert"], [ev["bloom_period_start"], ev["bloom_period_end"]])] \
+                        if len(eps) else eps
+                    if ev.get("evaluation") == "ACTIVITY-ONLY":
+                        plot_period(z, thr, ev, r, odir / f"event_{ev['id']}_r{r}.png", stamp)
+                    lim_rows.append({"event": ev["id"], "evaluation": ev["evaluation"], "intake": intake,
+                                     "radius_km": r, "f_threshold": thr,
                                      "period": f'{ev["bloom_period_start"]}..{ev["bloom_period_end"]}',
                                      "days": len(bp), "observed_days": int(bp["observed"].sum()),
                                      "exceed_or_alert_days": int(bp["state"].isin(["EXCEED", "ALERT"]).sum()),
                                      "alert_days": int((bp["state"] == "ALERT").sum()),
                                      "max_anom_frac": round(float(bp["anom_frac"].max()), 4),
-                                     "median_anom_frac": round(float(bp["anom_frac"].median()), 4)})
+                                     "median_anom_frac": round(float(bp["anom_frac"].median()), 4),
+                                     "alert_episodes_started": len(ep_in),
+                                     "first_alert_in_period": ep_in["first_alert"].min() if len(ep_in) else None,
+                                     "first_exceed_in_period": bp.loc[bp["state"].isin(["EXCEED", "ALERT"]), "date"].min()
+                                     if bp["state"].isin(["EXCEED", "ALERT"]).any() else None,
+                                     "evidence_status": ev["evidence_status"]})
         pd.concat(allz).to_csv(odir / f"zone_daily_r{r}.csv", index=False, float_format="%.4f")
 
     leads = pd.DataFrame(lead_rows)
     leads.to_csv(odir / "event_lead_times.csv", index=False)
     far = pd.DataFrame(far_rows)
     far.to_csv(odir / "false_alarms.csv", index=False)
-    pd.DataFrame(lim_rows).to_csv(odir / "limitation_test.csv", index=False)
+    pd.DataFrame(lim_rows).to_csv(odir / "period_activity.csv", index=False)
     cov = pd.DataFrame(cov_rows)
     cov.to_csv(odir / "coverage.csv", index=False)
     prov = {"detector": a.frozen, "tag_commit": tag_commit, "code_commit": commit,
             "config_sha256": sha256(repo_path("config/nadhir.yaml")),
             "frozen_config_sha256": sha256(repo_path(f"config/{a.frozen}.yaml")),
             "events_sha256": sha256(repo_path("events/events.yaml")),
-            "olci_bins_sha256": data_sha,
-            "olci_objects_manifests": sorted(p.name for p in ddir.glob("olci_objects_*.csv")),
-            "note": "Every source granule file is listed with SHA-256/ETag in data/derived/olci_objects_<year>.csv"}
+            "profile": prof["name"], "data": prof["data_label"],
+            "bins_sha256": data_sha,
+            "objects_manifests": sorted(p.name for p in ddir.glob(f"{prof['bins_prefix']}_objects*.csv")),
+            "note": f"Every source file is listed with SHA-256 in data/derived/{prof['bins_prefix']}_objects*.csv"}
     json.dump(prov, open(odir / "provenance.json", "w"), indent=1)
     print(leads.to_string())
     print(far.to_string())

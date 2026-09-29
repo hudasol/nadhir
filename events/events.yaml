@@ -1,11 +1,14 @@
 # Documented HAB-related desalination disruptions (and one documented-limitation case).
 # Every field cites SOURCES.md IDs. Evidence status follows SOURCES.md: in this session every
 # source could only be LOCATED by web search — page fetch was blocked (data/SOURCE_STATUS.md) —
-# so all are UNVERIFIED unless upgraded from the project owner's research repository
+# so all were UNVERIFIED unless upgraded from the project owner's research repository
 # hudasol/HAB-hyperspectral (read-only; its bibliography.md / data-access-log.md record fetched,
 # dated reads). Upgrades are marked "via HAB-hyperspectral" in SOURCES.md (added 2026-09-29).
 #
 # `dataset` says which frozen detector can score the event: olci_v1 (2018+) or modis_v1 (2003–2014).
+# 2026-09-30: statuses upgraded from page text fetched by the owner's assistant (SOURCES.md "Fetched
+# 2026-09-30"; DECISIONS D-016).
+#
 # ACTIVITY-ONLY events have no usable single date (season/year precision): we report the detector's
 # alert activity over the documented period instead of a lead time.
 #
@@ -28,10 +31,12 @@ events:
     shutdown_end: unknown
     date_precision: season
     first_sighting: "late August 2008, Dibba Al-Hassan (discoloration)"
-    evidence: [S-RICHLEN2010, S-ZHAO2014, S-NATIONAL-DESALTHREAT, S-NATIONAL-REOPEN, S-NATIONAL-VEOLIA, S-IDA-DAF]
+    evidence: [S-RICHLEN2010, S-ZHAO2014, S-NATIONAL-DESALTHREAT, S-NATIONAL-VEOLIA, S-IDA-DAF]
     evidence_status: "VERIFIED-SECONDARY (Fujairah plant losses during 2008–09 bloom: The National, via HAB-hyperspectral); shutdown dates UNVERIFIED"
     # No shutdown date exists in any source -> no lead time. Activity over the documented bloom:
-    # from first sighting (late Aug 2008, S-ZHAO2014) through "eight months" (S-NATIONAL-REOPEN).
+    # from first sighting (late Aug 2008, S-ZHAO2014) through "more than eight months" (S-RICHLEN2010, search
+    # summary). Corrected 2026-09-30 (D-016): this span was previously attributed to S-NATIONAL-REOPEN, whose
+    # fetched text does not contain it. Dates unchanged.
     bloom_period_start: "2008-08-21"
     bloom_period_end: "2009-04-30"
     evaluation: ACTIVITY-ONLY
@@ -44,14 +49,18 @@ events:
     lat: 25.95                  # ESTIMATED: Ghalilah coast, general gazetteer
     lon: 56.07
     coord_status: ESTIMATED
-    species: "Cochlodinium polykrikoides (same regional bloom, per S-RICHLEN2010 context)"
-    shutdown_start: "2008-09"   # "appeared in RAK early in September 2008"
-    shutdown_end: unknown
-    date_precision: month
-    t_ref: "2008-09-10"         # upper bound of "early September 2008" (S-NATIONAL-RAK)
-    t_ref_earliest: "2008-09-01"
-    evidence: [S-NATIONAL-RAK]
-    evidence_status: UNVERIFIED
+    species: "not stated in the RAK articles ('toxic red tide'); regional 2008 bloom was Cochlodinium polykrikoides (S-RICHLEN2010)"
+    # Corrected 2026-09-30 (D-016). Derivation: S-NATIONAL-RAK (published Sun 2 Nov 2008): Al Jeil without water
+    # for four days "starting Thursday" -> Thu 30 Oct 2008. S-NATIONAL-REOPEN (6 Nov 2008) independently: plant
+    # closed "on Thursday" of the previous week -> Thu 30 Oct 2008. The former "early September 2008" phrase
+    # is withdrawn: it is not in the fetched text.
+    shutdown_start: "2008-10-30"
+    shutdown_end: "2008-11-08 (hoped; 'We hope by Saturday it would be able to resume work', S-NATIONAL-REOPEN)"
+    date_precision: "day (ESTIMATED ±3 d)"
+    t_ref: "2008-10-30"
+    t_ref_earliest: "2008-10-27"   # -3 d (precision band)
+    evidence: [S-NATIONAL-RAK, S-NATIONAL-REOPEN]
+    evidence_status: VERIFIED-SECONDARY
     evaluation: EVALUATED
 
   - id: E2008-DIBBA
@@ -67,8 +76,9 @@ events:
     # Question answered: would the satellite detector have flagged the bloom before people saw it?
     t_ref: "2008-08-31"         # upper bound of "late August 2008" (S-ZHAO2014)
     t_ref_earliest: "2008-08-21"
-    evidence: [S-ZHAO2014, S-RICHLEN2010]
+    evidence: [S-ZHAO2014, S-RICHLEN2010, S-NATIONAL-RAK]
     evidence_status: "UNVERIFIED (date phrase from search summary; paper record itself confirmed via HAB-hyperspectral)"
+    corroboration: "S-NATIONAL-RAK (VERIFIED-SECONDARY, 2 Nov 2008): ~20,000 fish died at Diba Husn 'two months earlier' (~early Sep 2008). Consistent with, but does not date, the late-August sighting."
     evaluation: EVALUATED
 
   - id: E2013-KALBA
@@ -84,7 +94,7 @@ events:
     date_precision: year
     dataset: modis_v1
     evidence: [S-ARXIV2003.05694]
-    evidence_status: UNVERIFIED
+    evidence_status: "SECONDARY (preprint, verbatim quote confirmed 2026-09-30)"
     bloom_period_start: "2013-01-01"   # year-only precision -> activity over the whole year
     bloom_period_end: "2013-12-31"
     evaluation: ACTIVITY-ONLY
@@ -98,13 +108,13 @@ events:
     lon: 57.9816
     coord_status: ESTIMATED     # plant location (S-BARKA-LOC); intake offshore
     species: "not stated in located sources ('red tide' / 'algal bloom')"
-    shutdown_start: "2018-02"   # "Water production ... impacted ... since February 2018" (S-OBSERVER-SMN)
+    shutdown_start: "2018-02"   # affected by red tide "starting in February 2018" (S-OBSERVER-SMN, fetched 2026-09-30)
     shutdown_end: unknown
     date_precision: month
     t_ref: "2018-02-25"         # Oman Observer "Red tide in Barka likely to impact water supply" dated 25 Feb 2018 (S-OBSERVER-BARKA-2018)
     t_ref_earliest: "2018-02-01"
     evidence: [S-OBSERVER-SMN, S-OBSERVER-BARKA-2018, S-BARKA-LOC]
-    evidence_status: UNVERIFIED
+    evidence_status: "VERIFIED-SECONDARY (operator disclosure 'starting in February 2018' + 25 Feb 2018 committee report); coordinates still ESTIMATED"
     evaluation: EVALUATED       # OLCI mirror coverage begins 2018-01 -> lookback capped at ~55 days
 
   - id: E2018-KALBA
@@ -116,13 +126,13 @@ events:
     lon: 56.36
     coord_status: ESTIMATED
     species: "not stated in located sources ('Red Tide')"
-    shutdown_start: "<=2018-09-15"   # Gulf News report 15 Sep 2018; exact halt day not in located text
+    shutdown_start: "<=2018-09-15"   # WAM/Gulf News report 15 Sep 2018; the article does NOT state when the halt began
     shutdown_end: unknown            # "until ... effect ... had passed"; no resumption date located
     date_precision: day-of-report (upper bound)
     t_ref: "2018-09-15"
     t_ref_earliest: "2018-09-01"     # ASSUMPTION: report is about a current halt; month start as lower bound
     evidence: [S-GULFNEWS-2018, S-KT-2018, S-AB-2018]
-    evidence_status: UNVERIFIED
+    evidence_status: "VERIFIED-SECONDARY (WAM via Gulf News, 15 Sep 2018); S-KT-2018 / S-AB-2018 UNVERIFIED"
     evaluation: EVALUATED
 
   - id: E2023-BARKA
@@ -134,13 +144,13 @@ events:
     lon: 57.9816
     coord_status: ESTIMATED
     species: "not stated in located sources ('red tide')"
-    shutdown_start: "<=2023-07-24"
+    shutdown_start: "<=2023-07-24"   # Nama Water Services statement issued Mon 24 Jul 2023 (S-MUSCATDAILY-2023)
     shutdown_end: unknown
     date_precision: day-of-report (upper bound)
     t_ref: "2023-07-24"
     t_ref_earliest: "2023-07-01"     # ASSUMPTION: month start as lower bound
     evidence: [S-MUSCATDAILY-2023, S-MUSCATDAILY-2023-FISH]
-    evidence_status: UNVERIFIED
+    evidence_status: "VERIFIED-SECONDARY (Muscat Daily quoting Nama Water Services statement of 24 Jul 2023)"
     evaluation: EVALUATED
 
   - id: E2023-ALRAHA

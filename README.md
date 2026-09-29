@@ -19,8 +19,10 @@ Start with **STATUS.md** (what was done and what wasn't) and **outputs/RESULTS.m
   `NODATA` and shown in every chart.
 - **Tests** in `tests/` use tiny hand-made inputs in `tests/fixtures/`, labelled
   **SYNTHETIC TEST FIXTURE — not real data**. They test code logic only and are never used in any result.
-- **Events** (`events/events.yaml`) and **sources** (`SOURCES.md`): the evidence was located by web search, but the
-  pages could not be fetched from this environment, so every source is currently **UNVERIFIED**.
+- **Events** (`events/events.yaml`) and **sources** (`SOURCES.md`): news/paper pages could not be fetched from this
+  environment, so search-located sources are **UNVERIFIED**. Eight claims are upgraded to VERIFIED via the owner's
+  read-only research repo (hudasol/HAB-hyperspectral), including EAD's Al Raha April 2023 record; event *dates* for
+  Kalba, Barka, RAK and Dibba remain UNVERIFIED.
 - **Intake coordinates** are plant/town positions, all marked **ESTIMATED**.
 
 ## Blind protocol (applied twice)

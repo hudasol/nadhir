@@ -1,7 +1,7 @@
 # Nadhir Hindcast MVP — pre-submission corrections
 
-Head: `claude/affectionate-bardeen-isp1tm`. Base: `main` (does not exist yet — the repository has only this branch;
-suggested base commit for a corrections-only diff: `ca484e2`).
+Head: `claude/affectionate-bardeen-isp1tm`. Base: `main`, created at `ca484e2` (pre-correction state).
+Opened as https://github.com/hudasol/nadhir/pull/1.
 
 ## Changed claims
 - **RAK 2008 (E2008-RAK):** closure date "early Sep 2008" → **Thu 30 Oct 2008 (±3 d)**. Source: The National, 2 Nov 2008 ("four days starting Thursday") and 6 Nov 2008 ("closed on Thursday" of the previous week). "Early September" phrase withdrawn. VERIFIED-SECONDARY.

@@ -1,11 +1,13 @@
 {
  "detector": "frozen_detector_v1",
  "tag_commit": "723212e",
- "code_commit": "6d61890",
- "config_sha256": "ccfe7338f2bc25f6c31677440e293dc11e6a067e0fe48d76cf791b67e9c8216e",
+ "code_commit": "20aaaaf",
+ "config_sha256": "ba22ab0dc8076dab329e62d226d577f96bf984a7f46b9eba6803f0baece8a08d",
  "frozen_config_sha256": "0738a21f24e8173d225bba242f299b7df452b298579f19d6b58a81ba1dfe24ab",
- "events_sha256": "7426f9e3ebaacedff5e507713d51f6ba45ab93ff58c24f6fbcbf60e8cc1ee786",
- "olci_bins_sha256": {
+ "events_sha256": "d0f61218d5a69c7e8e172652b136863a5279a72c91312a1e371ee15fd021dff2",
+ "profile": "olci_v1",
+ "data": "Sentinel-3 OLCI L2 WFR OC4Me via AWS meeo-s3 mirror",
+ "bins_sha256": {
   "olci_bins_2018.csv.gz": {
    "gz_sha256": "61fc70b2957b548cd78a7baa48cb0cbb5b7c6576a8125b475d82a38cd2480a3c",
    "content_sha256": "64cedc8915584538f7db11a5a534141085d67ffd6368def7de20484893509803"
@@ -31,7 +33,7 @@
    "content_sha256": "d856eefe5e79ec6d660ad3f82b055686550d46780240d14216fb85b868d95e76"
   }
  },
- "olci_objects_manifests": [
+ "objects_manifests": [
   "olci_objects_2018.csv",
   "olci_objects_2019.csv",
   "olci_objects_2020.csv",
@@ -39,5 +41,5 @@
   "olci_objects_2022.csv",
   "olci_objects_2023.csv"
  ],
- "note": "Every source granule file is listed with SHA-256/ETag in data/derived/olci_objects_<year>.csv"
+ "note": "Every source file is listed with SHA-256 in data/derived/olci_objects*.csv"
 }

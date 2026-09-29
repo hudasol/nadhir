@@ -70,7 +70,7 @@ def main(argv=None):
     L.append("Charts: " + ", ".join(f"`event_{e}_r{r0}.png`" for e in p["event"]) + "\n")
 
     L.append("## 2. Sensitivity to watch radius (frozen at the same time; not tuned on events)\n")
-    s = leads[["event", "radius_km", "outcome", "lead_alert_days", "lead_alert_min_days", "lead_max_days", "f_threshold"]]
+    s = leads.reindex(columns=["event", "radius_km", "outcome", "obs_days_in_lookback", "lead_alert_days", "lead_alert_min_days", "lead_max_days", "f_threshold"])
     L.append(md_table(s.sort_values(["event", "radius_km"])))
     L.append("")
 

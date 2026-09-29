@@ -1,7 +1,7 @@
 {
  "detector": "frozen_detector_modis_v1",
  "tag_commit": "0eef7be",
- "code_commit": "ec2c176",
+ "code_commit": "20aaaaf",
  "config_sha256": "ba22ab0dc8076dab329e62d226d577f96bf984a7f46b9eba6803f0baece8a08d",
  "frozen_config_sha256": "5bca6f4cde794f511df89b95cbe4e33cf9fac0df88f725b75ce4bc8fc2f68941",
  "events_sha256": "d0f61218d5a69c7e8e172652b136863a5279a72c91312a1e371ee15fd021dff2",

@@ -1,10 +1,10 @@
 {
  "detector": "frozen_detector_v1",
  "tag_commit": "723212e",
- "code_commit": "20aaaaf",
+ "code_commit": "6566492",
  "config_sha256": "ba22ab0dc8076dab329e62d226d577f96bf984a7f46b9eba6803f0baece8a08d",
  "frozen_config_sha256": "0738a21f24e8173d225bba242f299b7df452b298579f19d6b58a81ba1dfe24ab",
- "events_sha256": "d0f61218d5a69c7e8e172652b136863a5279a72c91312a1e371ee15fd021dff2",
+ "events_sha256": "b7d1f9204ed57cadb0e499a6c56491bd9bf470fdc91a6733eef14093932bc760",
  "profile": "olci_v1",
  "data": "Sentinel-3 OLCI L2 WFR OC4Me via AWS meeo-s3 mirror",
  "bins_sha256": {

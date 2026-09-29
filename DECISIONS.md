@@ -69,3 +69,17 @@ Format: decision · alternatives considered · reason · date (UTC).
 - `git push origin frozen-detector-v1` → `error: RPC failed; HTTP 403` from the session git proxy (only the designated branch may be pushed). The frozen state is still verifiable remotely: commit `723212e` ("Freeze detector v1 …") was pushed to `claude/affectionate-bardeen-isp1tm` before any evaluation commit, and `config/frozen_detector_v1.yaml` records SHA-256 of the climatology and every calibration input. `make tag-check` accepts the local tag.
 - **To publish the tag:** `git tag -a frozen-detector-v1 723212e -m "Frozen detector v1" && git push origin frozen-detector-v1` from any machine with push rights.
 - **Date:** 2026-09-28
+
+## D-014 Second frozen detector on MODIS-Aqua 2003–2014 (`frozen-detector-modis-v1`)
+- **Data:** yearly NOAA CoastWatch ERDDAP subsets of `erdMH1chla1day` (MODIS-Aqua L3SMI daily 4 km chlorophyll, NASA OBPG R2018.1), box 48–60°E / 22–30°N, downloaded by the project owner on 2026-09-29 (ERDDAP request timestamps in file names and `history`) and shared read-only via github.com/hudasol/nadhir-raw-modis-data. SHA-256 of all 12 files: `data/derived/modis_objects.csv`.
+- **What changes vs v1:** only the sensor, the sites (kalba, fujairah, rak, dibba) and the blind-protocol periods (`profiles.modis_v1` in config). **Detector parameters are identical** (same `detector` section, same radii); no parameter was tuned. Native 4 km L3 cells are used as bins (no re-gridding; each cell is already a NASA L3 average).
+- **Periods:** calibration 2003–2007 (all full MODIS years before the first documented event, Aug 2008); held-out quiet 2010–2012 + 2014 (after the 2008–09 bloom; 2013 excluded because the Kalba event is dated only to the year).
+- **Events:** E2008-RAK (month precision → scored with t_ref = 10 Sep 2008 upper bound), E2008-DIBBA (first public sighting "late August" → scored as "did the satellite see it before people did"), E2008-FUJ and E2013-KALBA (season/year precision → ACTIVITY-ONLY: alert activity over the documented period, no lead time).
+- **Alternatives:** merge MODIS into v1 (would mix sensors in one climatology); re-tune thresholds for 4 km data (would break comparability and invite hindsight).
+- **Caveat:** 4 km cells near the coast are often masked; a 50 km zone around a Gulf of Oman intake is partly land. Coverage is reported per year.
+- **Date:** 2026-09-29 (before the MODIS freeze)
+
+## D-015 Evidence upgrades from the owner's research repository (read-only)
+- hudasol/HAB-hyperspectral records dated, fetched reads (2026-09-16) of the EAD 2022/2023 Marine Water Quality reports, the EAD HAB PDF, CrossRef records (Richlen 2010, Zhao & Ghedira 2014) and The National's "Desalination threat to the growing Gulf". These upgrade specific claims in SOURCES.md, each marked "via HAB-hyperspectral" with the date that project read it. They were not re-fetched in this session (hosts still blocked here).
+- The Al Raha April 2023 *Pseudo-nitzschia multistriata* incident is therefore VERIFIED-PRIMARY for place/month/species. The "2018 Saadiyat closures" mentioned in that repository were not added: no date or desalination impact is recorded there.
+- **Date:** 2026-09-29

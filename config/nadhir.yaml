@@ -115,3 +115,56 @@ detector:
 outputs:
   derived_dir: data/derived
   out_dir: outputs
+
+# ---------------------------------------------------------------------------------------------
+# Profiles: the SAME detector parameters (section `detector` above, unchanged) applied to another
+# sensor/period. Only data source, sites and blind-protocol periods differ. DECISIONS D-014.
+profiles:
+  modis_v1:
+    bins_prefix: modis
+    version: modis_v1
+    frozen_name: frozen_detector_modis_v1
+    tag: frozen-detector-modis-v1
+    data_label: "MODIS-Aqua L3SMI daily 4 km chlorophyll (NASA OBPG R2018.1), NOAA CoastWatch ERDDAP erdMH1chla1day subsets"
+    # Yearly ERDDAP subsets 2003–2014, box 48–60°E / 22–30°N, downloaded by the project owner on
+    # 2026-09-29 (ERDDAP request timestamps in file names/history) and shared READ-ONLY via
+    # github.com/hudasol/nadhir-raw-modis-data. Override with env NADHIR_MODIS_DIR.
+    data_dir: /home/user/hudasol/nadhir-raw-modis-data
+    file_glob: "erdMH1chla1day_*.nc"
+    variable: chlorophyll
+    intakes:
+      kalba:
+        name: "SEWA Kalba desalination (Gulf of Oman)"
+        lat: 25.05
+        lon: 56.36
+        coord_status: ESTIMATED
+        coord_note: "same as OLCI profile (Kalba town waterfront), uncertainty ~10 km"
+      fujairah:
+        name: "Fujairah SWRO (2008–09 shutdown)"
+        lat: 25.14
+        lon: 56.36
+        coord_status: ESTIMATED
+        coord_note: "Fujairah city coast, general gazetteer; plant/intake position not sourced. ~10 km from Kalba, so zones largely overlap."
+      rak:
+        name: "Al Ghalilah desalination plant, Ras Al Khaimah"
+        lat: 25.95
+        lon: 56.07
+        coord_status: ESTIMATED
+        coord_note: "Ghalilah coast, general gazetteer; uncertainty ~10 km"
+      dibba:
+        name: "Dibba Al-Hassan (site of first 2008 discoloration sighting; not an intake)"
+        lat: 25.59
+        lon: 56.27
+        coord_status: ESTIMATED
+        coord_note: "Dibba/Fujairah AOI centre used in hudasol/HAB-hyperspectral data-access-log.md (~56.27°E, 25.59°N)"
+    periods:
+      # Blind protocol, DECISIONS D-014: calibration = 2003–2007, the five full MODIS years before the
+      # first documented event (Aug 2008). Held-out quiet = 2010–2012 + 2014: after the 2008–09 bloom
+      # (Richlen 2010: >8 months from Aug 2008) and excluding 2013 (Kalba event dated to year only).
+      calibration: ["2003-01-01", "2007-12-31"]
+      heldout_quiet: ["2010-01-01", "2012-12-31"]
+      extra_quiet_years: [2014]
+      quiet_exclude: {}
+      event_exclusion_before_days: 120
+      event_exclusion_after_days: 90
+      data_start: "2003-01-01"

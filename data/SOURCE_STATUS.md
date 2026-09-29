@@ -73,3 +73,10 @@ See SOURCES.md for how this limits claim status.
 
 Add the blocked hosts above to the environment's allowed domains (cloud environment menu → Edit →
 Network access; https://code.claude.com/docs/en/claude-code-on-the-web), then run `make all`.
+
+## Update 2026-09-29 — owner-supplied data (route around the blocked hosts)
+
+| Dataset | Route | Result |
+|---|---|---|
+| MODIS-Aqua L3SMI daily 4 km chlorophyll, 2003–2014 (`erdMH1chla1day`) | Downloaded by the project owner from NOAA CoastWatch ERDDAP on 2026-09-29 (server-side subset 48–60°E, 22–30°N, one file per year), shared via github.com/hudasol/nadhir-raw-modis-data (**public repository**), cloned read-only here | **used** — 12 files, SHA-256 in `data/derived/modis_objects.csv`; metadata confirms NASA OBPG R2018.1 via ERDDAP |
+| Owner's research repository (EAD reports read-through, CrossRef checks, EnMAP/S2/Landsat/MODIS-monthly/CMEMS provenance tables) | github.com/hudasol/HAB-hyperspectral, attached **read-only**; clone write-protected (`chmod -R a-w`) | **used for evidence only** (SOURCES.md upgrades); its >6 GB imagery is not in the repository and was not needed |

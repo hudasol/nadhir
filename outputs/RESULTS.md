@@ -1,72 +1,78 @@
 # Nadhir Hindcast MVP — answer and caveats
 
-Detector: `frozen-detector-v1` (commit `723212e`, frozen from 2019–2021 data only before any event
-was scored). Every number here is copied from `outputs/frozen_detector_v1/*.csv`; the auto-generated
-tables with provenance hashes are in `outputs/frozen_detector_v1/RESULTS.md`.
+Two detectors were each frozen **before** any event was scored. Both use the same detector rules
+(DECISIONS D-010) with thresholds fitted only on quiet calibration years:
 
-## The question, answered with what the data supports
+| Detector | Satellite data | Years | Calibration (thresholds) | Frozen at commit |
+|---|---|---|---|---|
+| `frozen-detector-v1` | Sentinel-3 OLCI, 300 m, daily (AWS mirror) | 2018–2023 | 2019–2021 | `723212e` |
+| `frozen-detector-modis-v1` | MODIS-Aqua L3, 4 km, daily (NOAA ERDDAP, downloaded by the project owner) | 2003–2014 | 2003–2007 | `0eef7be` |
 
-**How many days of warning would Nadhir have given?** Of 7 documented events, 3 disruptions could be
-scored, because only 2018+ satellite data was reachable (`event_lead_times.csv`, `events/events.yaml`):
+Every number below is copied from `outputs/frozen_detector_v1/*.csv` or `outputs/frozen_detector_modis_v1/*.csv`.
+Each of those folders has an auto-generated `RESULTS.md` with the full tables and provenance hashes.
 
-| Event | Outcome (50 km watch radius) | Warning vs. public report date | Plausible range |
+## 1. How many days of warning would Nadhir have given?
+
+All figures use the primary 50 km watch radius. Sensitivity runs at 25 km and 100 km are in each folder's `event_lead_times.csv`.
+
+| Event | Detector | Outcome | Warning | Why |
+|---|---|---|---|---|
+| **SEWA Kalba shutdown, Sep 2018** | OLCI | **Detected** | alert 7 Sep, **8 days** before the 15 Sep report (plausible range −6 to +8 d) | clear anomaly (60–80% of zone) from 3 Sep |
+| Barka II disruption, Feb 2018 | OLCI | Missed | — | 20 clear days in lookback, no alert |
+| Barka disruption, Jul 2023 | OLCI | Missed | — | 66 clear days, no exceedance 3 May–23 Aug |
+| RAK Al Ghalilah closure, Sep 2008 | MODIS | **Not observable** | — | 1 clear day in the 121 days before (MODIS summer blind spot) |
+| First public sighting, Dibba, late Aug 2008 | MODIS | **Not observable** | — | 0 clear days in the 121 days before |
+| Fujairah SWRO, 2008–09 (no shutdown date exists) | MODIS | Activity only | first alert **16 Nov 2008**, about 11–12 weeks after the Dibba sighting | no clear data Jul–Sep 2008; anomaly appears once coverage returns |
+| Kalba 2013 (year only) | MODIS | Activity only | alert episode starting 18 May 2013; exceedances from 21 Jan | no date to compare against |
+
+**So, of the 5 dated disruptions:** 1 was detected (Kalba 2018), 2 were missed (Barka 2018, 2023), and 2 were not
+observable (RAK 2008, and the Dibba 2008 sighting that marks the bloom's arrival).
+
+**How confident is the 8-day number? Low, and it should not be a headline.**
+- n = 1 detection.
+- The anchor is a news report date (Gulf News, 15 Sep 2018), which is UNVERIFIED because the page could not be fetched. If SEWA halted on 1 Sep, the alert was 6 days late.
+- The bloom entered the 50 km zone between 31 Aug (last clear quiet day) and 3 Sep (first anomalous day). The 2-day persistence rule delayed the alert to 7 Sep.
+- At 100 km the warning is 11 days; at 25 km it is 8 days. All radii were frozen before scoring.
+
+## 2. How often does it alarm when nothing documented is happening?
+
+Held-out years, 50 km (`false_alarms.csv`). These are **upper bounds**, because undocumented real blooms may occur in those years.
+
+| Site | Detector | Alert episodes per year | Share of clear days in alert |
 |---|---|---|---|
-| SEWA Kalba shutdown, Sep 2018 (E2018-KALBA) | **Detected** | alert 2018-09-07, **8 days** before the 15 Sep report | −6 to +8 days (see below) |
-| Barka II disruption, Feb 2018 (E2018-BARKA) | **Missed** | 20 clear observations in the 56 days before 25 Feb; one isolated exceedance (8 Jan, no persistence), no alert | — |
-| Barka disruption, Jul 2023 (E2023-BARKA) | **Missed** | 66 clear observations in the 121-day lookback; a short alert on 12 Apr closed long before; no exceedance at all from 3 May to 23 Aug | — |
+| Kalba | OLCI (2022 + parts of 2018/2023) | 2.20 | 4.5% |
+| Barka | OLCI | 2.35 | 4.9% |
+| Al Raha | OLCI | 2.56 | 3.0% |
+| Kalba | MODIS (2010–12, 2014) | 1.00 | 1.9% |
+| Fujairah | MODIS | 1.25 | 2.2% |
+| RAK | MODIS | 1.50 | 2.0% |
+| Dibba | MODIS | 1.50 | 3.1% |
 
-**How confident is the 8-day number? Low. It should not be used as a headline.**
-- n = 1 detection. Nothing can be said about typical skill from a single event.
-- The anchor date is a news report date (Gulf News, 15 Sep 2018). That page could not be fetched, so the
-  source is UNVERIFIED (`SOURCES.md` S-GULFNEWS-2018). The actual halt may have come earlier. If it came
-  on 1 Sep, the alert would have been 6 days late (`lead_alert_min_days = -6`).
-- Satellite sampling: the last clear, quiet observation was 31 Aug and the first anomalous one 3 Sep, so
-  the bloom entered the 50 km zone between those dates (`lead_max_days = 15`, `lead_first_exceed_days = 12`).
-  The 2-observation persistence rule delayed the alert to 7 Sep.
-- Radius sensitivity: 25 km gives 8 d and 100 km gives 11 d (`event_lead_times.csv`). All three radii were frozen before scoring.
-- Kalba also had a separate alert episode from 15 to 27 Jul 2018, which closed 7 Aug (`episodes_kalba_r50.csv`).
-  It falls inside the event exclusion window, so it isn't counted as a false alarm, but we cannot tell
-  whether it was a precursor, a separate bloom, or a false alarm.
+MODIS raises fewer alarms per year partly because it sees far fewer days: 16–29% of days are observable, against 30–70% for OLCI.
 
-**How often does it alarm in quiet periods?** Held-out periods with no documented disruption (2022, plus 2018/2023
-outside event windows), 50 km (`false_alarms.csv`):
+## 3. The biggest finding: broadband MODIS is blind in the Gulf of Oman summer
 
-| Intake | Alert episodes per year | Share of clear days in alert |
-|---|---|---|
-| Kalba | 2.20 | 4.5% |
-| Barka | 2.35 | 4.9% |
-| Al Raha | 2.56 | 3.0% |
+Within 50 km of Dibba, MODIS L3 daily had **zero** usable days in July and August in **every** year from
+2003 to 2014, and 0–9 days per month in May, June and September (`zone_daily_r50.csv`; the MODIS climatology has no July/August
+bins at all). OLCI over the same coast had **6–21 usable days per month in July–August** in every year 2018–2023.
+The 2008 bloom began in late August and the 2018 Kalba shutdown was in September, both inside this window.
+- **Implication for Nadhir:** a MODIS-era (2002–2016) archive cannot show early warning for late-summer blooms on this coast. Sentinel-3 OLCI observed it (6–21 clear days/month) at Kalba and Barka.
+- **Cause (hypothesis, not tested here):** the standard NASA L3 masks (aerosol/dust, sun glint, stray light) remove summer retrievals. Custom L2 processing might recover some days.
 
-These are **upper bounds** on false alarms, because undocumented real blooms may fall in these periods.
-The share of clear days in alert (3.0–4.9%) is comparable to the 5% daily-exceedance design target, so the calibration did not degrade badly out of sample.
-At 100 km the rate rises to 3.1–4.6 episodes/yr.
+## 4. Documented-limitation case: Al Raha, April 2023 (*Pseudo-nitzschia multistriata*)
+This case is now **VERIFIED-PRIMARY** via EAD's 2023 Marine Water Quality report, as read by the owner's HAB-hyperspectral project.
+- **Daily OLCI:** no alerts in April–August 2023, and the median anomaly fraction was 0.0 over 102 clear days. There were two short alert episodes in September 2023 (`period_activity.csv`).
+- **Independent monthly MODIS/CMEMS check (HAB-hyperspectral):** 2.25 and 2.03 mg/m³ in April 2023, within the normal range.
+- Two sensors at two time resolutions agree: **a toxic diatom bloom that EAD documented produced no broadband chlorophyll anomaly.** This is the case for Nadhir's hyperspectral species layer.
 
-## Documented-limitation case (Al Raha 2023)
-Over the documented bloom period of 1 Apr–9 Oct 2023, there were 102 clear days at 50 km. The median anomaly fraction was
-0.0, with no alerts in April–August and two short alert episodes in September (6 Sep; 25–27 Sep)
-(`limitation_test.csv`, `episodes_alraha_r50.csv`). This agrees with the brief's point that broadband chlorophyll did not
-flag the spring bloom. However, the specific claim (EAD, *Pseudo-nitzschia multistriata*, April 2023, "no
-anomaly") was **not found in any source we could locate** (`SOURCES.md` S-EAD-MWQ-2023). The species is
-unconfirmed.
-
-## Why the two Barka misses happened (hypotheses, not findings)
-1. Barka's Feb 2018 disruption falls in the Gulf of Oman winter bloom season, and the Feb climatology (2019–2021)
-   already contains high chlorophyll, so a bloom may not be *anomalous* for February. Testable: inspect
-   `data/derived/climatology_v1.csv.gz` for Barka bins in month 2 against `zone_daily_r50.csv`.
-2. Dense near-shore red tides can be removed by quality flags (cloud / atmospheric-correction failures)
-   or sit inside the first 300 m pixels, which are land-adjacent. The detector counts only valid pixels.
-3. At Barka, 2021+ data (processing collection 003) runs a median 0.10 log10 lower than 2019–20 (002)
-   in the same bin-month (`data/derived/qa_baseline_step.csv`, DECISIONS D-011). That biases 2023 z-scores down.
-4. July is the season of highest data loss (monsoon haze, glint): see NO-DATA density in `event_E2023-BARKA_r50.png`.
-
-## Not evaluated
-The 2008–09 *Cochlodinium* events (Fujairah SWRO, RAK Al Ghalilah) and the 2013 Kalba shutdown predate the only
-reachable ocean-colour source. SeaWiFS, MODIS, MERIS and OC-CCI hosts were all blocked (`data/SOURCE_STATUS.md`).
-Exact commands to add them are in `scripts/download_blocked_sources.sh`.
+## 5. Why the Barka misses may have happened (hypotheses, not findings)
+1. Barka's Feb 2018 disruption falls in the winter bloom season, when the February climatology is already high.
+2. Dense near-shore red tides can be removed by quality flags or sit in land-adjacent pixels.
+3. The OLCI processing change (collection 002 to 003) lowers Barka chlorophyll by a median 0.10 log10 (D-011). That biases 2023 z-scores down.
+4. July–August have the fewest OLCI clear days at Barka (6–20 per month).
 
 ## Bottom line for a utility engineer
-In this hindcast, a broadband chlorophyll-anomaly watch around the intake caught 1 of 3 documented disruptions
-it could see. The one catch came about a week before the public report. It raises about 2–2.5 alert episodes
-per year per site when nothing documented is happening. That is not yet evidence of operational skill. It is a
-reproducible, blind baseline that the next steps must beat: 2008–2013 events via MODIS/SeaWiFS once hosts are
-allowed, verified event dates from operators, and currents-based upstream zones.
+In this blind hindcast, a broadband chlorophyll-anomaly watch caught **1 of 3 observable dated disruptions**. That one catch came about a week before the public report. The other **2 dated disruptions fell in the MODIS summer blind spot**. The watch raises about 1–2.5 alert episodes per year per site when nothing documented is happening. This is **not yet evidence of operational skill**. It is a reproducible, blind baseline, and it gives three concrete engineering lessons:
+1. Use OLCI-class sensors, not MODIS L3, for summer coverage.
+2. Expect species-level misses (Al Raha) that only a hyperspectral layer can address.
+3. Get operator log dates. The report-date anchor is the largest uncertainty in every lead time.

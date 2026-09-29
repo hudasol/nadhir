@@ -1,6 +1,12 @@
 # SOURCES
 
-**Access method, all entries: 2026-09-28, server-side WebSearch tool.** Direct page fetch (WebFetch and curl)
+> **Update 2026-09-29:** several entries are upgraded using the project owner's research repository
+> `hudasol/HAB-hyperspectral` (opened read-only), whose `bibliography.md` and `data-access-log.md` record
+> dated, fetched reads (2026-09-16). See the section "Upgrades via HAB-hyperspectral" at the end — those
+> statuses supersede the table below where they differ. Upgraded claims were **not re-fetched in this
+> session** (the hosts are still blocked here); the status names the project and date that read them.
+
+**Access method, table below: 2026-09-28, server-side WebSearch tool.** Direct page fetch (WebFetch and curl)
 to every news, publisher and agency host was refused by this environment's egress policy
 (data/SOURCE_STATUS.md). The "excerpt" column is therefore the **search tool's summary of the page,
 not verbatim page text**. Under rule 3 none of these can be VERIFIED in this session:
@@ -38,3 +44,24 @@ not verbatim page text**. Under rule 3 none of these can be VERIFIED in this ses
 ## Claims we explicitly do NOT make
 - Any production-loss or cost figure (US$100k/day, 30–40%) as a headline: UNVERIFIED here.
 - That EAD found no broadband chlorophyll anomaly at Al Raha in April 2023: no source located. We test it with OLCI data instead (outputs/).
+
+## Upgrades via HAB-hyperspectral (added 2026-09-29)
+
+Source of each upgrade: `github.com/hudasol/HAB-hyperspectral` (commit `3fe7b4e`, read-only clone), files
+`bibliography.md` (audit pass 2026-09-16) and `data-access-log.md` / `results-log.md`. Quotes below are
+verbatim from those files; the underlying pages were fetched by that project, not by this session.
+
+| ID | What is now verified | Status | Verbatim from HAB-hyperspectral |
+|---|---|---|---|
+| S-RICHLEN2010 | Citation: Richlen, M. L. et al. (2010), *Harmful Algae* 9(2), 163–172, DOI `10.1016/j.hal.2009.08.013` | **VERIFIED-PRIMARY** (bibliographic record, CrossRef, 2026-09-16). Content phrases in the table above remain search summaries. | "DOI confirmed via CrossRef this session: `10.1016/j.hal.2009.08.013`, published in *Harmful Algae* 9(2), 163-172." |
+| S-ZHAO2014 | Citation: Zhao & Ghedira (2014), *Mar. Pollut. Bull.* 79(1-2), 305–313, DOI `10.1016/j.marpolbul.2013.10.057` | **VERIFIED-PRIMARY** (record fetched 2026-09-16). The "late August 2008, Dibba" phrase used for E2008-DIBBA is NOT confirmed by that read → that date stays UNVERIFIED. | "Confirmed via fetch that the abstract/text … states that 61% of global seawater desalination capacity sits on Gulf coastlines and that red tide 'could force the shutdown of desalination plants'" |
+| S-NATIONAL-DESALTHREAT (new) | Fujairah plant losses during the 2008–09 bloom | **VERIFIED-SECONDARY** (The National quoting a Veolia Water spokesperson) | "*The National* ('Desalination threat to the growing Gulf,' `thenationalnews.com/uae/environment/desalination-threat-to-the-growing-gulf-1.553346`) reports 'daily losses of more than Dh367,000 (US$100,000)' at the Fujairah plant during the 2008-09 bloom" |
+| S-EARTHORG (new) | Same US$100k/day figure, independent outlet | VERIFIED-SECONDARY (news/data outlet) | "Earth.org ('Red Tides in the UAE') independently states 'The Abu Dhabi Water Resources Master Plan estimated losses of more than US$100,000 (Dh368,000) a day…'" |
+| (figure) | US$100k/day | The Master Plan itself could NOT be verified to contain it (HAB-hyperspectral checked the Yumpu copy and EAD's IWRM PDF). Use only as "reported by The National, quoting Veolia". | "the $100k+/day figure cannot be traced to a directly verifiable primary document" |
+| S-EAD-MWQ-2023 | Al Raha Beach red tide, April 2023, *Pseudo-nitzschia multistriata* | **VERIFIED-PRIMARY** (EAD 2023 Annual Marine Water Quality Report, full read-through 2026-09-16) | "one Red Tide incident at Al Raha Beach, dated April 2023, caused by *Pseudo-nitzschia multistriata*, a domoic-acid-producing diatom." |
+| S-EAD-HAB | EAD monitoring since 2002; 268 incidents; *Cochlodinium polykrikoides* among EAD's causative species; impacts include desalination plant disruption | **VERIFIED-PRIMARY** (full read-through 2026-09-16) | "EAD has monitored HABs since 2002; 268 total incidents investigated"; "Impacts stated: fish kills, shellfish poisoning, coral degradation, beach closures, desalination plant disruption." |
+| S-HABHYP-BROADBAND (new) | Independent broadband check at Al Raha, April 2023 | INDEPENDENT ANALYSIS (owner's project; their NASA OB.DAAC MODIS monthly and CMEMS GlobColour downloads; not re-run here) | "Al Raha Beach, April 2023 …: NASA 2.25 mg/m³, CMEMS 2.03 mg/m³ — both within the site's normal range, no chlorophyll anomaly detectable at broadband resolution." |
+| S-MODIS-ERDDAP (new, data) | MODIS-Aqua daily 4 km chlorophyll 2003–2014 used by `frozen-detector-modis-v1` | **VERIFIED-PRIMARY** (file metadata read directly here): title "Chlorophyll-a, Aqua MODIS, NPP, L3SMI, Global, 4km, Science Quality, 2003-2022 (1 Day Composite)", processing_version 2018.1QLP, ERDDAP `history` "…https://coastwatch.pfeg.noaa.gov/erddap/griddap/". Downloaded by the project owner 2026-09-29; SHA-256 per file in `data/derived/modis_objects.csv`. | — |
+
+Still UNVERIFIED after this pass: all event *dates* for Kalba 2013/2018, Barka 2018/2023, RAK 2008 and the Dibba
+"late August" sighting; all intake coordinates.

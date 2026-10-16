@@ -5,7 +5,8 @@ intakes. This repository answers one question using only real historical data: *
 bloom-related desalination disruption, how many days of warning would a satellite chlorophyll-anomaly
 detector have given, how confident is that number, and how often does it alarm in quiet periods?**
 
-Start with **STATUS.md** (what was done and what wasn't) and **outputs/RESULTS.md** (numbers + caveats).
+Start with **EXECUTIVE_SUMMARY.md**, then **outputs/RESULTS.md** (findings + caveats) and **STATUS.md**.
+Award brief: **docs/MBR_SUBMISSION_BRIEF.md**.
 
 ## What is real and what is not
 - **Data (two detectors, same rules):**
@@ -20,9 +21,9 @@ Start with **STATUS.md** (what was done and what wasn't) and **outputs/RESULTS.m
 - **Tests** in `tests/` use tiny hand-made inputs in `tests/fixtures/`, labelled
   **SYNTHETIC TEST FIXTURE — not real data**. They test code logic only and are never used in any result.
 - **Events** (`events/events.yaml`) and **sources** (`SOURCES.md`): news/paper pages could not be fetched from this
-  environment, so search-located sources are **UNVERIFIED**. Eight claims are upgraded to VERIFIED via the owner's
-  read-only research repo (hudasol/HAB-hyperspectral), including EAD's Al Raha April 2023 record; event *dates* for
-  Kalba, Barka, RAK and Dibba remain UNVERIFIED.
+  environment. Claims are upgraded via the owner's read-only research repo (hudasol/HAB-hyperspectral), including EAD's
+  Al Raha April 2023 record, and via page text fetched 2026-09-30 by the owner's assistant: Kalba 2018, Barka 2018/2023
+  and RAK 2008 (corrected to 30 Oct 2008) are VERIFIED-SECONDARY. The Dibba "late August 2008" date remains UNVERIFIED.
 - **Intake coordinates** are plant/town positions, all marked **ESTIMATED**.
 
 ## Blind protocol (applied twice)

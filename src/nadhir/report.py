@@ -53,7 +53,7 @@ def main(argv=None):
     L.append(f"- config/nadhir.yaml sha256 `{prov['config_sha256'][:16]}…`; frozen config sha256 `{prov['frozen_config_sha256'][:16]}…`; events.yaml sha256 `{prov['events_sha256'][:16]}…`.")
     L.append("- Input bin tables (content sha256 of decompressed CSV): " + ", ".join(
         f"`{k}` `{v['content_sha256'][:12]}…`" for k, v in prov["bins_sha256"].items()))
-    L.append(f"- Source files (SHA-256 per file): " + ", ".join(f"`data/derived/{m}`" for m in prov["objects_manifests"]) + ".")
+    L.append("- Source files (SHA-256 per file): " + ", ".join(f"`data/derived/{m}`" for m in prov["objects_manifests"]) + ".")
     L.append(f"- Data: {prof['data_label']}.\n")
 
     L.append(f"## 1. Event lead times (primary watch radius {r0} km)\n")

@@ -15,10 +15,8 @@ data/derived/olci_objects.csv, so each derived number traces to identified sourc
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import io
-import math
 import sys
 import threading
 from concurrent.futures import ProcessPoolExecutor, as_completed

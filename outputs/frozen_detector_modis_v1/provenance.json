@@ -1,10 +1,10 @@
 {
  "detector": "frozen_detector_modis_v1",
  "tag_commit": "0eef7be",
- "code_commit": "20aaaaf",
+ "code_commit": "6566492",
  "config_sha256": "ba22ab0dc8076dab329e62d226d577f96bf984a7f46b9eba6803f0baece8a08d",
  "frozen_config_sha256": "5bca6f4cde794f511df89b95cbe4e33cf9fac0df88f725b75ce4bc8fc2f68941",
- "events_sha256": "d0f61218d5a69c7e8e172652b136863a5279a72c91312a1e371ee15fd021dff2",
+ "events_sha256": "b7d1f9204ed57cadb0e499a6c56491bd9bf470fdc91a6733eef14093932bc760",
  "profile": "modis_v1",
  "data": "MODIS-Aqua L3SMI daily 4 km chlorophyll (NASA OBPG R2018.1), NOAA CoastWatch ERDDAP erdMH1chla1day subsets",
  "bins_sha256": {

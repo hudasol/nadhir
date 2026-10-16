@@ -40,7 +40,6 @@ Two blind, reproducible hindcasts on real satellite data:
 - **Not done:** sea temperature, currents and drift modelling (D-006); the Barka miss diagnosis (hypotheses only in RESULTS §5).
 
 ## Next steps after submission
-0. Review and merge PR https://github.com/hudasol/nadhir/pull/1 (`main` created at `ca484e2`, the pre-correction state).
 1. Re-try the two failed fetches (Khaleej Times 2018, Arabian Business 2018) and confirm the Dibba "late August 2008" phrase in Zhao & Ghedira (2014) full text; everything else in SOURCES.md is now fetched or verified.
 2. Get operator shutdown logs and intake coordinates (SEWA, SMN Barka, Nama). These are the largest lead-time uncertainty.
 3. Publish the tags from a machine with push rights:
